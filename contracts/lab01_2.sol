@@ -23,6 +23,12 @@ contract RockPaperScissors {
     uint256 public stake;
     address public winner;
     bool public gameDone;
+    uint256 public revealDeadline;
+
+    // Events:
+    event revealEvent(address addr, uint256 Vote);
+    event playEvent(address addr, bytes32 encVote);
+    event withdrawEvent(address addr, uint256 amount);
 
 
     function play(uint256 _move, uint256 salt) public payable {
@@ -35,6 +41,7 @@ contract RockPaperScissors {
             playerAEncVote = keccak256(abi.encodePacked(_move, salt));
             playerARevealed = false;
             stake = msg.value;
+            emit playEvent(msg.sender, playerAEncVote);
         }
         else if(playerB == address(0)){
             require(msg.sender != playerA, "Same player cannot join the game");
@@ -43,6 +50,7 @@ contract RockPaperScissors {
             playerBVote = 0;
             playerBEncVote = keccak256(abi.encodePacked(_move, salt));
             playerBRevealed = false;
+            emit playEvent(msg.sender, playerBEncVote);
         }
         else {
             revert("Full game");
@@ -51,13 +59,14 @@ contract RockPaperScissors {
 
     function reveal(uint256 _move, uint256 salt) public {
         require(!gameDone, "game is already done");
-        require(playerAEncVote == bytes32(0) || playerBEncVote == bytes32(0), "Both players need to vote first");
+        require(playerAEncVote != bytes32(0) || playerBEncVote != bytes32(0), "Both players need to vote first");
         if(msg.sender == playerA){
             require(playerARevealed == false, "You have already revealed");
             bytes32 checkVote = keccak256(abi.encodePacked(_move, salt));
             require(checkVote == playerAEncVote, "Invalid reveal"); // assures that player does not change vote when revealing
             playerAVote = _move;
             playerARevealed = true;
+            emit revealEvent(msg.sender, _move);
         }
         else if(msg.sender == playerA){
             require(playerBRevealed == false, "You have already revealed");
@@ -65,9 +74,13 @@ contract RockPaperScissors {
             require(checkVote == playerBEncVote, "Invalid reveal"); 
             playerBVote = _move;
             playerBRevealed = true;
+            emit revealEvent(msg.sender, _move);
         }
         else {
             revert("Can not find player");
+        }
+        if (revealDeadline == 0) {
+            revealDeadline = block.timestamp + 60; // 60 seconds to reveal
         }
         if(playerARevealed == true && playerBRevealed == true) {
             winner = findWinner();
@@ -92,15 +105,36 @@ contract RockPaperScissors {
         return playerB;
         }
     }
+    function forceWin() public {
+        require(revealDeadline > 0, "Reveal phase has not started");
+        require(block.timestamp > revealDeadline, "Reveal time has not expired");
+        require(!gameDone, "Game is already done");
+
+        // If only player A revealed, they win
+        if (playerARevealed && !playerBRevealed) {
+            winner = playerA;
+        } 
+        // If only player B revealed, they win
+        else if (playerBRevealed && !playerARevealed) {
+            winner = playerB;
+        } 
+
+        gameDone = true;
+        withdraw();
+    }
 
     function withdraw() private {
         if(winner == address(0)){
             payable(playerA).transfer(stake);
             payable(playerB).transfer(stake);
+            emit withdrawEvent(playerA, stake);
+            emit withdrawEvent(playerB, stake);
         }
         else{
             payable(winner).transfer(stake*2);
+            emit withdrawEvent(winner, stake*2);
         }
+        
         resetGame();
     }
 
@@ -118,5 +152,6 @@ contract RockPaperScissors {
         stake = 0;
         winner = address(0);
         gameDone = false;
+        revealDeadline = 0;
     }
 }

@@ -6,6 +6,63 @@
 	"output": {
 		"abi": [
 			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "addr",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "encVote",
+						"type": "bytes32"
+					}
+				],
+				"name": "playEvent",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "addr",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "Vote",
+						"type": "uint256"
+					}
+				],
+				"name": "revealEvent",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "addr",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "withdrawEvent",
+				"type": "event"
+			},
+			{
 				"inputs": [],
 				"name": "PAPER",
 				"outputs": [
@@ -42,6 +99,13 @@
 					}
 				],
 				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "forceWin",
+				"outputs": [],
+				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -199,6 +263,19 @@
 			},
 			{
 				"inputs": [],
+				"name": "revealDeadline",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
 				"name": "stake",
 				"outputs": [
 					{
@@ -252,11 +329,11 @@
 	},
 	"sources": {
 		"contracts/lab01_2.sol": {
-			"keccak256": "0x1a58f14e213757b7ad2031e0046d99b3b9c96066c6840f642f7d216a1ee6739d",
+			"keccak256": "0xd8632de126287ac6ee27c521847b74f15eeb7f73bbeaf22013e97020e3fd692b",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://abe6234b916940d3f9dd11e3b4ee31374830021a72365bdc458445f576aeedd6",
-				"dweb:/ipfs/QmdJU2s1kPfyYxzjrU6VPWxJem613XLdLxbdQHkGiVktte"
+				"bzz-raw://a4fc7b0a77480d0e776bd831ff51f7e67e79d08e0d186acbf315b7cad930ebea",
+				"dweb:/ipfs/QmWEjM3GTSdDzp9s4kaan7tHDmwS5fLYrW7H5yukRx4wmJ"
 			]
 		}
 	},
