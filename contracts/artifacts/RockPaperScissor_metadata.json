@@ -1,0 +1,77 @@
+{
+	"compiler": {
+		"version": "0.8.25+commit.b61c2a91"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "_move",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "salt",
+						"type": "uint256"
+					}
+				],
+				"name": "Vote",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "hashedMove",
+						"type": "bytes32"
+					}
+				],
+				"name": "play",
+				"outputs": [],
+				"stateMutability": "payable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/lab01_2.sol": "RockPaperScissor"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/lab01_2.sol": {
+			"keccak256": "0x84b8e68fe042cc72a12fdbe589202358b6d9201a026eeab00ed6b8e8147c2db2",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://0abf0a28cc920d8032264069d9473a2003a2bf24eafbfcf94fd935bfe7e772b9",
+				"dweb:/ipfs/QmW4s33bPoBexdnDH6mHYAudJpBUrKmsMkixnmRPVC7NmL"
+			]
+		}
+	},
+	"version": 1
+}

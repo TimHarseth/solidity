@@ -1,40 +1,122 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <0.9.0;
 
-contract RockPaperScissor {
-    uint public firstBet = 0;
-    
-    enum Moves {None, Rock, Paper, Scissor} // All possible moves
-    enum Won {PlayerA, PlayerB, Draw} // All outcomes
+contract RockPaperScissors {
+    // Moves
+    uint256 public constant ROCK = 1;
+    uint256 public constant PAPER = 2;
+    uint256 public constant SCISSORS = 3;
 
-    struct Game {
-        address playerA;
-        address playerB;
-        bytes32 encMoveA;
-        bytes32 encMoveB;
-        uint stake;
+    // Player A variables:
+    address public playerA;
+    bytes32 public playerAEncVote;
+    uint256 public playerAVote;
+    bool public playerARevealed;
+
+    // Player B variabels:
+    address public playerB;
+    bytes32 public playerBEncVote;
+    uint256 public playerBVote;
+    bool public playerBRevealed;
+
+    // general variables:
+    uint256 public stake;
+    address public winner;
+    bool public gameDone;
+
+
+    function play(uint256 _move, uint256 salt) public payable {
+        require(msg.value >= 1 ether, "Bet must be over 1 ether");
+        require(_move == 1 || _move == 2 || _move == 3, "Invalid Move");
+
+        if(playerA == address(0)){
+            playerA = msg.sender;
+            playerAVote = 0;
+            playerAEncVote = keccak256(abi.encodePacked(_move, salt));
+            playerARevealed = false;
+            stake = msg.value;
+        }
+        else if(playerB == address(0)){
+            require(msg.sender != playerA, "Same player cannot join the game");
+            require(msg.value == stake, "Must match the stake of first player");
+            playerB = msg.sender;
+            playerBVote = 0;
+            playerBEncVote = keccak256(abi.encodePacked(_move, salt));
+            playerBRevealed = false;
+        }
+        else {
+            revert("Full game");
+        }
     }
 
-    mapping(uint256 => Game) public games;
-    uint public gameID = 0;
-
-    function play(bytes32 hashedMove) public payable {
-        if (games[gameID].playerA == address(0)){ // first player
-            games[gameID] = Game({
-                playerA: msg.sender,
-                playerB: address(0),
-                encMoveA: hashedMove,
-                encMoveB: 0,
-                stake: msg.value
-            });
+    function reveal(uint256 _move, uint256 salt) public {
+        require(!gameDone, "game is already done");
+        require(playerAEncVote == bytes32(0) || playerBEncVote == bytes32(0), "Both players need to vote first");
+        if(msg.sender == playerA){
+            require(playerARevealed == false, "You have already revealed");
+            bytes32 checkVote = keccak256(abi.encodePacked(_move, salt));
+            require(checkVote == playerAEncVote, "Invalid reveal"); // assures that player does not change vote when revealing
+            playerAVote = _move;
+            playerARevealed = true;
         }
-        else { // second player
-            games[gameID] = Game({
-                Game storage game = games[gameIdCounter];
-
-                require(game.playerB == address(0), "Game is full");
-                require(msg.value == game.stake, "Stake must match");
-            })
+        else if(msg.sender == playerA){
+            require(playerBRevealed == false, "You have already revealed");
+            bytes32 checkVote = keccak256(abi.encodePacked(_move, salt));
+            require(checkVote == playerBEncVote, "Invalid reveal"); 
+            playerBVote = _move;
+            playerBRevealed = true;
         }
+        else {
+            revert("Can not find player");
+        }
+        if(playerARevealed == true && playerBRevealed == true) {
+            winner = findWinner();
+            gameDone = true;
+            withdraw();
+        }
+    }
+
+    function findWinner() private view returns (address) {
+        if(playerAVote == playerBVote){
+            return address(0); // draw
+        }
+        else if(
+            (playerAVote == 1 && playerBVote == 3) || // Rock beats Scissors
+            (playerAVote == 2 && playerBVote == 1) || // Paper beats Rock
+            (playerAVote == 3 && playerBVote == 2)    // Scissors beats Paper
+            )
+        {
+        return playerA;
+        }
+        else {
+        return playerB;
+        }
+    }
+
+    function withdraw() private {
+        if(winner == address(0)){
+            payable(playerA).transfer(stake);
+            payable(playerB).transfer(stake);
+        }
+        else{
+            payable(winner).transfer(stake*2);
+        }
+        resetGame();
+    }
+
+    function resetGame() private{
+        playerA = address(0);
+        playerAEncVote = bytes32(0);
+        playerAVote = 0;
+        playerARevealed = false;
+
+        playerB = address(0);
+        playerBEncVote = bytes32(0);
+        playerBVote = 0;
+        playerBRevealed = false;
+
+        stake = 0;
+        winner = address(0);
+        gameDone = false;
     }
 }
