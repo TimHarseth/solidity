@@ -338,11 +338,11 @@
 	},
 	"sources": {
 		"contracts/lab01_2.sol": {
-			"keccak256": "0x4036db954b5a784699951f33d13827d45895bb60e9e8a7927b49d042296d4f4f",
+			"keccak256": "0xe2038abf762ff9da199c662cfc41f737ce8e6f84012b2a4d1c69f19dc56080a0",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://23ecd7e79ba9cc62f1aad3baed3c4632a220b40890ef203b3956be88a6b867e5",
-				"dweb:/ipfs/Qmcch2mM4dFt4wNDCicu9E15Mo4pYevQWcEh7BZN33kanb"
+				"bzz-raw://a7e2c3ab076aeac11c4000891758707e94161ca676c8c2c886faabbf4ce7f439",
+				"dweb:/ipfs/QmNaEC9qNPGdJY16rg2Ees5DM5yeqRNLXuV2SzJ4BxLMKb"
 			]
 		}
 	},
