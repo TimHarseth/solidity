@@ -124,14 +124,9 @@
 			{
 				"inputs": [
 					{
-						"internalType": "uint256",
-						"name": "_move",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "salt",
-						"type": "uint256"
+						"internalType": "bytes32",
+						"name": "_hashedVote",
+						"type": "bytes32"
 					}
 				],
 				"name": "play",
@@ -244,6 +239,13 @@
 				"type": "function"
 			},
 			{
+				"inputs": [],
+				"name": "resetGame",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "uint256",
@@ -299,6 +301,13 @@
 				],
 				"stateMutability": "view",
 				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "withdraw",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
 			}
 		],
 		"devdoc": {
@@ -329,11 +338,11 @@
 	},
 	"sources": {
 		"contracts/lab01_2.sol": {
-			"keccak256": "0xd8632de126287ac6ee27c521847b74f15eeb7f73bbeaf22013e97020e3fd692b",
+			"keccak256": "0x4036db954b5a784699951f33d13827d45895bb60e9e8a7927b49d042296d4f4f",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://a4fc7b0a77480d0e776bd831ff51f7e67e79d08e0d186acbf315b7cad930ebea",
-				"dweb:/ipfs/QmWEjM3GTSdDzp9s4kaan7tHDmwS5fLYrW7H5yukRx4wmJ"
+				"bzz-raw://23ecd7e79ba9cc62f1aad3baed3c4632a220b40890ef203b3956be88a6b867e5",
+				"dweb:/ipfs/Qmcch2mM4dFt4wNDCicu9E15Mo4pYevQWcEh7BZN33kanb"
 			]
 		}
 	},

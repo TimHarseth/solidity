@@ -23,22 +23,20 @@ contract RockPaperScissors {
     uint256 public stake;
     address public winner;
     bool public gameDone;
-    uint256 public revealDeadline;
+    uint256 public revealDeadline = 0;
 
     // Events:
     event revealEvent(address addr, uint256 Vote);
     event playEvent(address addr, bytes32 encVote);
     event withdrawEvent(address addr, uint256 amount);
 
-
-    function play(uint256 _move, uint256 salt) public payable {
+    // Play Rock, Paper and Scissors
+    function play(bytes32 _hashedVote) public payable {
         require(msg.value >= 1 ether, "Bet must be over 1 ether");
-        require(_move == 1 || _move == 2 || _move == 3, "Invalid Move");
-
         if(playerA == address(0)){
             playerA = msg.sender;
             playerAVote = 0;
-            playerAEncVote = keccak256(abi.encodePacked(_move, salt));
+            playerAEncVote = _hashedVote;
             playerARevealed = false;
             stake = msg.value;
             emit playEvent(msg.sender, playerAEncVote);
@@ -48,7 +46,7 @@ contract RockPaperScissors {
             require(msg.value == stake, "Must match the stake of first player");
             playerB = msg.sender;
             playerBVote = 0;
-            playerBEncVote = keccak256(abi.encodePacked(_move, salt));
+            playerBEncVote = _hashedVote;
             playerBRevealed = false;
             emit playEvent(msg.sender, playerBEncVote);
         }
@@ -59,16 +57,16 @@ contract RockPaperScissors {
 
     function reveal(uint256 _move, uint256 salt) public {
         require(!gameDone, "game is already done");
-        require(playerAEncVote != bytes32(0) || playerBEncVote != bytes32(0), "Both players need to vote first");
+        require(playerAEncVote != bytes32(0) && playerBEncVote != bytes32(0), "Both players need to vote first");
         if(msg.sender == playerA){
             require(playerARevealed == false, "You have already revealed");
             bytes32 checkVote = keccak256(abi.encodePacked(_move, salt));
-            require(checkVote == playerAEncVote, "Invalid reveal"); // assures that player does not change vote when revealing
+            require(checkVote == playerAEncVote, "Invalid reveal"); // assures that hashedVote and reveal parameters are valid
             playerAVote = _move;
             playerARevealed = true;
             emit revealEvent(msg.sender, _move);
         }
-        else if(msg.sender == playerA){
+        else if(msg.sender == playerB){
             require(playerBRevealed == false, "You have already revealed");
             bytes32 checkVote = keccak256(abi.encodePacked(_move, salt));
             require(checkVote == playerBEncVote, "Invalid reveal"); 
@@ -80,7 +78,7 @@ contract RockPaperScissors {
             revert("Can not find player");
         }
         if (revealDeadline == 0) {
-            revealDeadline = block.timestamp + 60; // 60 seconds to reveal
+            revealDeadline = block.timestamp + 3 minutes; // 3 minutes to reveal
         }
         if(playerARevealed == true && playerBRevealed == true) {
             winner = findWinner();
@@ -123,7 +121,9 @@ contract RockPaperScissors {
         withdraw();
     }
 
-    function withdraw() private {
+    function withdraw() public {
+        require(gameDone == true);
+        require(msg.sender == playerA || msg.sender == playerB, "Not a player in this game");
         if(winner == address(0)){
             payable(playerA).transfer(stake);
             payable(playerB).transfer(stake);
@@ -134,11 +134,10 @@ contract RockPaperScissors {
             payable(winner).transfer(stake*2);
             emit withdrawEvent(winner, stake*2);
         }
-        
-        resetGame();
     }
 
-    function resetGame() private{
+    function resetGame() public{
+        require(gameDone == true);
         playerA = address(0);
         playerAEncVote = bytes32(0);
         playerAVote = 0;
@@ -155,3 +154,13 @@ contract RockPaperScissors {
         revealDeadline = 0;
     }
 }
+
+/*TESTING HASH
+
+0xd8dec90d0976f60ca43a5479e6fe32e37efc8928dc1f66fec4099a94f16c4347 | 1,444
+
+0xf806280aa4dfe145596c627f696302876be30d4ea721e7e2b62aecde7954710a | 1,255
+
+0xc738b5b09a9697438b038e38384f7abd49615ca1942159a1844b9d47bd06540f | 2,777
+
+*/
